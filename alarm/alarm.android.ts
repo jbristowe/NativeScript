@@ -15,7 +15,8 @@ class AlarmReceiver extends android.content.BroadcastReceiver {
     }
 
     onReceive(context: android.content.Context, intent: android.content.Intent) {
-        android.widget.Toast.makeText(context, this._message, android.widget.Toast.LENGTH_LONG).show();
+        var message = intent.getExtras().getString("message");
+        android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show();
     }
 }
 
@@ -23,8 +24,11 @@ export function add(fireDate: Date, message: string): number {
     alarmId++;
 
     var alarmManager = <android.app.AlarmManager>context.getSystemService(android.content.Context.ALARM_SERVICE);
-    
-    var pendingIntent = android.app.PendingIntent.getBroadcast(context, 0, new android.content.Intent(context, AlarmReceiver.class), 0);
+
+    var intent = new android.content.Intent(context, AlarmReceiver.class);
+    intent.putExtra("message", message);
+
+    var pendingIntent = android.app.PendingIntent.getBroadcast(context, 0, intent, 0);
 
     alarmManager.set(android.app.AlarmManager.RTC_WAKEUP, fireDate.getTime(), pendingIntent);
 
