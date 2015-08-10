@@ -1,22 +1,14 @@
 ﻿import utils = require("utils/utils");
 
+var MESSAGE = "message"
 var context = utils.ad.getApplicationContext();
 
 var alarmId = 0;
 var alarms = {};
 
 class AlarmReceiver extends android.content.BroadcastReceiver {
-    private _message: string;
-
-    constructor() {
-        super();
-
-        return global.__native(this);
-    }
-
     onReceive(context: android.content.Context, intent: android.content.Intent) {
-        var message = intent.getExtras().getString("message");
-        android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show();
+        android.widget.Toast.makeText(context, intent.getExtras().getString(MESSAGE), android.widget.Toast.LENGTH_LONG).show();
     }
 }
 
@@ -26,7 +18,7 @@ export function add(fireDate: Date, message: string): number {
     var alarmManager = <android.app.AlarmManager>context.getSystemService(android.content.Context.ALARM_SERVICE);
 
     var intent = new android.content.Intent(context, AlarmReceiver.class);
-    intent.putExtra("message", message);
+    intent.putExtra(MESSAGE, message);
 
     var pendingIntent = android.app.PendingIntent.getBroadcast(context, 0, intent, 0);
 
@@ -40,7 +32,7 @@ export function add(fireDate: Date, message: string): number {
 }
 
 export function remove(id: number): void {
-    if (alarms[id] instanceof UILocalNotification) {
+    if (alarms[id] instanceof android.app.PendingIntent) {
         var alarmManager = <android.app.AlarmManager>context.getSystemService(android.content.Context.ALARM_SERVICE);
         alarmManager.cancel(alarms[id]);
         delete alarms[id];
