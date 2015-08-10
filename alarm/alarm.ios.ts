@@ -1,20 +1,19 @@
 ﻿var alarmId = 0;
 var alarms = {};
 
-var settings: UIUserNotificationSettings
 var app = UIApplication.sharedApplication();
+
+if (app.registerUserNotificationSettings && app.currentUserNotificationSettings &&
+    !(app.currentUserNotificationSettings().types & UIUserNotificationType.UIUserNotificationTypeSound & UIUserNotificationType.UIUserNotificationTypeAlert)) {
+    app.registerUserNotificationSettings(UIUserNotificationSettings.settingsForTypesCategories(UIUserNotificationType.UIUserNotificationTypeAlert |
+        UIUserNotificationType.UIUserNotificationTypeSound | UIUserNotificationType.UIUserNotificationTypeBadge, null));
+}
 
 export function add(fireDate: Date, message: string): number {
     alarmId++;
 
-    if (!settings && app.registerUserNotificationSettings) {
-        settings = UIUserNotificationSettings.settingsForTypesCategories(UIUserNotificationType.UIUserNotificationTypeAlert |
-            UIUserNotificationType.UIUserNotificationTypeSound | UIUserNotificationType.UIUserNotificationTypeBadge, null);
-        app.registerUserNotificationSettings(settings);
-    }
-
     var localNotification = UILocalNotification.new();
-    localNotification.fireDate = NSDate.dateWithTimeIntervalSince1970(fireDate.getTime() / 1000);
+    (<any>localNotification).fireDate = fireDate;
     localNotification.alertBody = message;
     localNotification.soundName = UILocalNotificationDefaultSoundName;
     localNotification.applicationIconBadgeNumber = 1;
